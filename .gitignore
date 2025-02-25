@@ -1,0 +1,6 @@
+*
+!.gitignore
+!.mybashrc.sh
+!.mybash_logout.sh
+!.nanorc
+!to-env.c
