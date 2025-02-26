@@ -1,4 +1,4 @@
-![demo.gif](https://github.com/Muzraf/.dotfiles/blob/main/demo.gif)
+![demo.gif](./demo.gif)
 
 deps: 
 ```
