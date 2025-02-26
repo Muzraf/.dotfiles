@@ -51,6 +51,7 @@ for ((i=0;i<=len;i++));do
 	echo
 done;
 tput civis
+stty -echo
 for ((i=0;i<=n;i++)); do
 	c=$((c+1))
 	c=$((c%len))
@@ -65,11 +66,12 @@ for ((i=0;i<=n;i++)); do
 			tput setab 0
 		fi
 	done;
-	read -t 1
+	read -t 1 -n1
 	if [ $? -eq 0 ]; then
 		break;
 	fi
 done;
+stty echo
 tput cnorm
 cd ${paths[c]}
 ls
