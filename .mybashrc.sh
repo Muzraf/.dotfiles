@@ -14,13 +14,16 @@ echo
 char_print_full "="
 
 len=0
-paths[$len]=$PWD
+paths[$len]="$PWD"
 len=$((len + 1))
-paths[$len]=$HOME/storage/downloads
+paths[$len]="$HOME/storage/downloads"
 len=$((len + 1))
 if [ -f ~/.dir-last ]; then
-	paths[len]=$(cat ~/.dir-last | tail -n -1)
-	len=$((len + 1))
+	lines=$(wc ~/.dir-last --lines | cut -f1 -d " ")
+	for ((i=1;i<=$lines;i++)); do
+		paths[len]="$(cat ~/.dir-last | tail -n -$i | head -n 1)"
+		len=$((len + 1))
+	done
 fi
 
 for ((i=0;i<len-1;i++));do
@@ -39,7 +42,7 @@ for ((i=0;i<len;i++)); do
 	if [[ ${paths[i]} == "" ]]; then
 		continue;
 	fi
-	if [ $i -eq $j ]; then
+	if [ $i -gt $j ]; then
 		paths[$j]=${paths[i]}
 	fi
 	j=$((j+1))
@@ -50,6 +53,7 @@ c=-1
 for ((i=0;i<=len;i++));do
 	echo
 done;
+tput rmam
 tput civis
 stty -echo
 for ((i=0;i<=n;i++)); do
@@ -59,11 +63,12 @@ for ((i=0;i<=n;i++)); do
 	echo $((n-i))
 	for ((j=0;j<len;j++)); do
 		if [ $j -eq $c ];then
-			tput setab 4
+			tput setab 7
+			tput setaf 0
 		fi
-		echo $(to-env ${paths[j]})
+		echo $(to-env -c $columns "${paths[j]}")
 		if [ $j -eq $c ];then
-			tput setab 0
+			tput sgr0
 		fi
 	done;
 	read -t 1 -n1
@@ -73,5 +78,15 @@ for ((i=0;i<=n;i++)); do
 done;
 stty echo
 tput cnorm
-cd ${paths[c]}
+tput smam
+cd "${paths[c]}"
 ls
+
+zig() {
+	if [[ $@ =~ .*"-target".* ]]; then
+		command zig $@
+	else
+		command zig $@ -target aarch64-linux-musl
+	fi
+		
+}

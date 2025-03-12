@@ -1,1 +1,1 @@
-echo $PWD > ~/.dir-last
+dirlast
