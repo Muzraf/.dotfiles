@@ -13,41 +13,17 @@ fortune | fold -w $columns -s
 echo
 char_print_full "="
 
+dirlast
+
 len=0
-paths[$len]="$PWD"
-len=$((len + 1))
-paths[$len]="$HOME/storage/downloads"
-len=$((len + 1))
 if [ -f ~/.dir-last ]; then
 	lines=$(wc ~/.dir-last --lines | cut -f1 -d " ")
 	for ((i=1;i<=$lines;i++)); do
-		paths[len]="$(cat ~/.dir-last | tail -n -$i | head -n 1)"
+		paths[len]="$(cat ~/.dir-last | head -n $i | tail -n -1)"
 		len=$((len + 1))
 	done
 fi
 
-for ((i=0;i<len-1;i++));do
-
-	if [[ ${paths[i]} == "" ]]; then
-		continue;
-	fi
-	for ((j=i+1;j<len;j++));do
-		if [[ ${paths[i]} == ${paths[j]} ]]; then
-			unset paths[$j];
-		fi
-	done;
-done;
-j=0;
-for ((i=0;i<len;i++)); do
-	if [[ ${paths[i]} == "" ]]; then
-		continue;
-	fi
-	if [ $i -gt $j ]; then
-		paths[$j]=${paths[i]}
-	fi
-	j=$((j+1))
-done;
-len=$j;
 n=$((len**3));
 c=-1
 for ((i=0;i<=len;i++));do
@@ -83,10 +59,27 @@ cd "${paths[c]}"
 ls
 
 zig() {
+	if [[ $@ =~ .*"init".* ]]; then
+		command zig $@
+		return
+	fi
 	if [[ $@ =~ .*"-target".* ]]; then
 		command zig $@
 	else
 		command zig $@ -target aarch64-linux-musl
 	fi
-		
 }
+
+dcd() {
+	if [ $# -eq 0 ]; then
+		cat ~/.dir-last
+		return
+	fi
+	if [ $1 -eq 0 ]; then
+		cd ~/storage/downloads
+		return
+	fi
+	cd $(head ~/.dir-last -n $1 | tail -n -1)
+}
+
+alias cd..='cd ..'
